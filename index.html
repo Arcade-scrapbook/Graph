@@ -487,6 +487,106 @@
                 }
             });
         }
+    function updateDoughnutChart() {
+            const ctx = document.getElementById('doughnutChart').getContext('2d');
+            if (charts.doughnut) {
+                charts.doughnut.destroy();
+            }
+            charts.doughnut = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.map(item => item.label),
+                    datasets: [{
+                        label: 'Doughnut Chart',
+                        data: data.map(item => item.value),
+                        backgroundColor: data.map(() => generateRandomColor()),
+                    }]
+                },
+                options: {
+                    responsive: true,
+                }
+            });
+        }
+
+        function updateScatterPlot() {
+            const ctx = document.getElementById('scatterPlot').getContext('2d');
+            if (charts.scatter) {
+                charts.scatter.destroy();
+            }
+            charts.scatter = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Scatter Plot',
+                        data: data.map((item, index) => ({ x: index, y: item.value })),
+                        backgroundColor: generateRandomColor(),
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom'
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateRadarChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            if (charts.radar) {
+                charts.radar.destroy();
+            }
+            charts.radar = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: data.map(item => item.label),
+                    datasets: [{
+                        label: 'Radar Chart',
+                        data: data.map(item => item.value),
+                        backgroundColor: generateRandomColor() + '80',
+                        borderColor: generateRandomColor(),
+                        pointBackgroundColor: generateRandomColor(),
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    elements: {
+                        line: {
+                            borderWidth: 3
+                        }
+                    }
+                }
+            });
+        }
+
+        function updatePolarAreaChart() {
+            const ctx = document.getElementById('polarAreaChart').getContext('2d');
+            if (charts.polarArea) {
+                charts.polarArea.destroy();
+            }
+            charts.polarArea = new Chart(ctx, {
+                type: 'polarArea',
+                data: {
+                    labels: data.map(item => item.label),
+                    datasets: [{
+                        label: 'Polar Area Chart',
+                        data: data.map(item => item.value),
+                        backgroundColor: data.map(() => generateRandomColor()),
+                    }]
+                },
+                options: {
+                    responsive: true,
+                }
+            });
+        }
+
+       
 </script
 </body>
 
