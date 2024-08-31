@@ -586,7 +586,109 @@
             });
         }
 
-       
+       function updateBubbleChart() {
+            const ctx = document.getElementById('bubbleChart').getContext('2d');
+            if (charts.bubble) {
+                charts.bubble.destroy();
+            }
+            charts.bubble = new Chart(ctx, {
+                type: 'bubble',
+                data: {
+                    datasets: [{
+                        label: 'Bubble Chart',
+                        data: data.map((item, index) => ({
+                            x: index,
+                            y: item.value,
+                            r: Math.abs(item.value) / 2
+                        })),
+                        backgroundColor: data.map(() => generateRandomColor() + '80'),
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom'
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateDummyData() {
+            const dummyLabels = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape', 'Honeydew', 'Imbe', 'Jackfruit'];
+            const dummyData = [];
+            for (let i = 0; i < 10; i++) {
+                dummyData.push({
+                    label: dummyLabels[i],
+                    value: Math.floor(Math.random() * 100) + 1
+                });
+            }
+            return dummyData;
+        }
+
+        function loadDummyData() {
+            data = generateDummyData();
+            updateDataTable();
+            updateCharts();
+            updateDataAnalysis();
+        }
+
+        function loadSampleDatasets() {
+            const datasets = {
+                'Monthly Sales': [
+                    { label: 'Jan', value: 1000 },
+                    { label: 'Feb', value: 1200 },
+                    { label: 'Mar', value: 900 },
+                    { label: 'Apr', value: 1500 },
+                    { label: 'May', value: 2000 },
+                    { label: 'Jun', value: 1800 },
+                ],
+                'Customer Satisfaction': [
+                    { label: 'Product A', value: 4.5 },
+                    { label: 'Product B', value: 3.8 },
+                    { label: 'Product C', value: 4.2 },
+                    { label: 'Product D', value: 4.7 },
+                    { label: 'Product E', value: 3.9 },
+                ],
+                'Website Traffic': [
+                    { label: 'Mon', value: 5000 },
+                    { label: 'Tue', value: 6000 },
+                    { label: 'Wed', value: 4500 },
+                    { label: 'Thu', value: 5500 },
+                    { label: 'Fri', value: 7000 },
+                    { label: 'Sat', value: 4000 },
+                    { label: 'Sun', value: 3500 },
+                ],
+            };
+
+            const datasetSelect = document.createElement('select');
+            datasetSelect.id = 'dataset-select';
+            for (const [name, _] of Object.entries(datasets)) {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                datasetSelect.appendChild(option);
+            }
+
+            const loadButton = document.createElement('button');
+            loadButton.textContent = 'Load Selected Dataset';
+            loadButton.onclick = () => {
+                const selectedDataset = document.getElementById('dataset-select').value;
+                data = datasets[selectedDataset];
+                updateDataTable();
+                updateCharts();
+                updateDataAnalysis();
+            };
+
+            const container = document.querySelector('.data-input');
+            container.appendChild(datasetSelect);
+            container.appendChild(loadButton);
+        }
 </script
 </body>
 
