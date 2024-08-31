@@ -996,6 +996,91 @@ function exportToCSV() {
                     }
                 }
             });
+             const analysisResults = document.getElementById('advancedAnalysisResults');
+            analysisResults.innerHTML += `
+                <h3>Polynomial Regression Analysis:</h3>
+                <p><strong>Equation:</strong> y = ${equation[2].toFixed(4)}x² + ${equation[1].toFixed(4)}x + ${equation[0].toFixed(4)}</p>
+                <p><strong>R-squared:</strong> ${r2.toFixed(4)}</p>
+            `;
+        }
+
+        function performOutlierDetection() {
+            if (data.length < 4) {
+                showError('Not enough data points to perform outlier detection');
+                return;
+            }
+
+            const values = data.map(item => item.value);
+            const q1 = calculateQuantile(values, 0.25);
+            const q3 = calculateQuantile(values, 0.75);
+            const iqr = q3 - q1;
+            const lowerBound = q1 - 1.5 * iqr;
+            const upperBound = q3 + 1.5 * iqr;
+
+            const outliers = data.filter(item => item.value < lowerBound || item.value > upperBound);
+
+            const ctx = document.getElementById('scatterPlot').getContext('2d');
+            if (charts.outliers) {
+                charts.outliers.destroy();
+            }
+            charts.outliers = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Normal Data Points',
+                            data: data
+                                .filter(item => item.value >= lowerBound && item.value <= upperBound)
+                                .map((item, index) => ({ x: index, y: item.value })),
+                            backgroundColor: generateRandomColor(),
+                        },
+                        {
+                            label: 'Outliers',
+                            data: outliers.map((item, index) => ({ x: index, y: item.value })),
+                            backgroundColor: 'red',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom'
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            const analysisResults = document.getElementById('advancedAnalysisResults');
+            analysisResults.innerHTML += `
+                <h3>Outlier Detection:</h3>
+                <p><strong>Number of outliers:</strong> ${outliers.length}</p>
+                <p><strong>Outliers:</strong> ${outliers.map(item => `${item.label}: ${item.value}`).join(', ')}</p>
+            `;
+        }
+
+        function calculateQuantile(arr, q) {
+            const sorted = arr.slice().sort((a, b) => a - b);
+            const pos = (sorted.length - 1) * q;
+            const base = Math.floor(pos);
+            const rest = pos - base;
+            if (sorted[base + 1] !== undefined) {
+                return sorted[base] + rest * (sorted[base + 1] - sorted[base]);
+            } else {
+                return sorted[base];
+            }
+        }
+
+        function calculateZScores() {
+            if (data.length < 2) {
+                showError('Not enough data points to calculate Z-scores');
+                return;
+            }
+
 </script
 </body>
 
