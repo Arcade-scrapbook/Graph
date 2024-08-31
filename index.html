@@ -7,7 +7,62 @@
     <title>Advanced Interactive Graph Website</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/regression/2.0.1/regression.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
+        h1,
+        h2,
+        h3 {
+            color: #2c3e50;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .chart-container {
+            width: 45%;
+            margin-bottom: 20px;
+        }
+
+        .full-width {
+            width: 100%;
+        }
+
+        input,
+        select,
+        button {
+            margin: 5px;
+            padding: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+    </style>
 </head>
 
 <body>
@@ -89,6 +144,60 @@
         </div>
     </div>
 
+    <div id="Analysis" class="tabcontent">
+        <h2>Data Analysis</h2>
+        <div id="analysisResults"></div>
+
+        <h3>Advanced Data Analysis</h3>
+        <button onclick="calculateMovingAverage(3)">Calculate Moving Average (Window: 3)</button>
+        <button onclick="calculateExponentialMovingAverage(0.2)">Calculate Exponential Moving Average (α: 0.2)</button>
+        <button onclick="calculateCorrelation()">Calculate Correlation</button>
+        <button onclick="calculateLinearRegression()">Calculate Linear Regression</button>
+        <button onclick="calculatePolynomialRegression()">Calculate Polynomial Regression</button>
+        <button onclick="performOutlierDetection()">Perform Outlier Detection</button>
+        <button onclick="calculateZScores()">Calculate Z-Scores</button>
+
+        <div id="advancedAnalysisResults"></div>
+    </div>
+
+    <div id="Forecasting" class="tabcontent">
+        <h2>Forecasting</h2>
+        <div>
+            <h3>Time Series Forecasting</h3>
+            <label for="forecast-periods">Number of periods to forecast:</label>
+            <input type="number" id="forecast-periods" min="1" max="10" value="3">
+            <button onclick="performTimeSeriesForecasting()">Perform Time Series Forecasting</button>
+        </div>
+        <div id="forecastingResults"></div>
+        <canvas id="forecastingChart"></canvas>
+    </div>
+
+    <div id="Export" class="tabcontent">
+        <h2>Data Export/Import</h2>
+        <button onclick="exportToCSV()">Export to CSV</button>
+        <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+        <button onclick="document.getElementById('csvFileInput').click()">Import from CSV</button>
+
+        <h3>Download Charts</h3>
+        <button onclick="downloadChart('barChart', 'bar_chart.png')">Download Bar Chart</button>
+        <button onclick="downloadChart('lineChart', 'line_chart.png')">Download Line Chart</button>
+        <button onclick="downloadChart('pieChart', 'pie_chart.png')">Download Pie Chart</button>
+        <button onclick="downloadChart('doughnutChart', 'doughnut_chart.png')">Download Doughnut Chart</button>
+        <button onclick="downloadChart('scatterPlot', 'scatter_plot.png')">Download Scatter Plot</button>
+        <button onclick="downloadChart('radarChart', 'radar_chart.png')">Download Radar Chart</button>
+        <button onclick="downloadChart('polarAreaChart', 'polar_area_chart.png')">Download Polar Area Chart</button>
+        <button onclick="downloadChart('bubbleChart', 'bubble_chart.png')">Download Bubble Chart</button>
+
+        <h3>Generate Report</h3>
+        <button onclick="generateReport()">Generate Report</button>
+    </div>
+
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p id="errorMessage"></p>
+        </div>
+    </div>
 
 </body>
 
