@@ -889,7 +889,113 @@ function exportToCSV() {
                 showError('Not enough data points to calculate linear regression');
                 return;
             }
+
+            const x = data.map((_, i) => i);
+            const y = data.map(item => item.value);
+
+            const result = regression.linear(x.map((xi, i) => [xi, y[i]]));
+            const slope = result.equation[0];
+            const intercept = result.equation[1];
+            const r2 = result.r2;
+
+            const regressionLine = x.map(xi => slope * xi + intercept);
+
+            const ctx = document.getElementById('scatterPlot').getContext('2d');
+            if (charts.regression) {
+                charts.regression.destroy();
+            }
+            charts.regression = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Data Points',
+                            data: data.map((item, index) => ({ x: index, y: item.value })),
+                            backgroundColor: generateRandomColor(),
+                        },
+                        {
+                            label: 'Linear Regression',
+                            data: regressionLine.map((y, x) => ({ x, y })),
+                            type: 'line',
+                            borderColor: generateRandomColor(),
+                            fill: false,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom'
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            const analysisResults = document.getElementById('advancedAnalysisResults');
+            analysisResults.innerHTML += `
+                <h3>Linear Regression Analysis:</h3>
+                <p><strong>Slope:</strong> ${slope.toFixed(4)}</p>
+                <p><strong>Y-intercept:</strong> ${intercept.toFixed(4)}</p>
+                <p><strong>R-squared:</strong> ${r2.toFixed(4)}</p>
+                <p><strong>Equation:</strong> y = ${slope.toFixed(2)}x + ${intercept.toFixed(2)}</p>
+            `;
         }
+
+        function calculatePolynomialRegression() {
+            if (data.length < 3) {
+                showError('Not enough data points to calculate polynomial regression');
+                return;
+            }
+
+            const x = data.map((_, i) => i);
+            const y = data.map(item => item.value);
+
+            const result = regression.polynomial(x.map((xi, i) => [xi, y[i]]), { order: 2 });
+            const equation = result.equation;
+            const r2 = result.r2;
+
+            const regressionCurve = x.map(xi => equation[0] + equation[1] * xi + equation[2] * Math.pow(xi, 2));
+
+            const ctx = document.getElementById('scatterPlot').getContext('2d');
+            if (charts.regression) {
+                charts.regression.destroy();
+            }
+            charts.regression = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Data Points',
+                            data: data.map((item, index) => ({ x: index, y: item.value })),
+                            backgroundColor: generateRandomColor(),
+                        },
+                        {
+                            label: 'Polynomial Regression',
+                            data: regressionCurve.map((y, x) => ({ x, y })),
+                            type: 'line',
+                            borderColor: generateRandomColor(),
+                            fill: false,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom'
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
 </script
 </body>
 
