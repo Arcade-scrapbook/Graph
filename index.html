@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Interactive Graph Website</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/regression/2.0.1/regression.min.js"></script>
+
+</head>
+
+<body>
+    <h1>Advanced Interactive Graph Website</h1>
+
+    <div class="tab">
+        <button class="tablinks" onclick="openTab(event, 'DataInput')">Data Input</button>
+        <button class="tablinks" onclick="openTab(event, 'Charts')">Charts</button>
+        <button class="tablinks" onclick="openTab(event, 'Analysis')">Analysis</button>
+        <button class="tablinks" onclick="openTab(event, 'Forecasting')">Forecasting</button>
+        <button class="tablinks" onclick="openTab(event, 'Export')">Export</button>
+    </div>
+
+    <div id="DataInput" class="tabcontent">
+        <h2>Data Input</h2>
+        <div class="data-input">
+            <input type="text" id="label-input" placeholder="Label">
+            <input type="number" id="value-input" placeholder="Value">
+            <button onclick="addData()">Add Data</button>
+            <button onclick="clearData()">Clear All Data</button>
+            <button onclick="loadDummyData()">Load Dummy Data</button>
+            <button onclick="loadSampleDatasets()">Load Sample Datasets</button>
+        </div>
+
+        <div class="data-table">
+            <h3>Data Table</h3>
+            <table id="data-table">
+                <thead>
+                    <tr>
+                        <th>Label</th>
+                        <th>Value</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="data-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="Charts" class="tabcontent">
+        <h2>Charts</h2>
+        <div class="container">
+            <div class="chart-container">
+                <h3>Bar Chart</h3>
+                <canvas id="barChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Line Chart</h3>
+                <canvas id="lineChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Pie Chart</h3>
+                <canvas id="pieChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Doughnut Chart</h3>
+                <canvas id="doughnutChart"></canvas>
+            </div>
+        </div>
+
+        <div class="full-width">
+            <h3>Scatter Plot</h3>
+            <canvas id="scatterPlot"></canvas>
+        </div>
+
+        <div class="full-width">
+            <h3>Radar Chart</h3>
+            <canvas id="radarChart"></canvas>
+        </div>
+
+        <div class="full-width">
+            <h3>Polar Area Chart</h3>
+            <canvas id="polarAreaChart"></canvas>
+        </div>
+
+        <div class="full-width">
+            <h3>Bubble Chart</h3>
+            <canvas id="bubbleChart"></canvas>
+        </div>
+    </div>
+
+
+</body>
+
+</html>
