@@ -148,6 +148,8 @@
         }
 
 
+
+
         input[type="text"]:focus,
         input[type="number"]:focus,
         select:focus {
@@ -160,7 +162,6 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-
 
         @keyframes fadeIn {
             from {
@@ -334,7 +335,8 @@
             <p id="errorMessage"></p>
         </div>
     </div>
-<script>
+
+    <script>
         let data = [];
         let charts = {};
 
@@ -374,7 +376,8 @@
                 showError('Please enter valid label and value.');
             }
         }
-       function clearData() {
+
+        function clearData() {
             data = [];
             updateDataTable();
             updateCharts();
@@ -487,7 +490,8 @@
                 }
             });
         }
-    function updateDoughnutChart() {
+
+        function updateDoughnutChart() {
             const ctx = document.getElementById('doughnutChart').getContext('2d');
             if (charts.doughnut) {
                 charts.doughnut.destroy();
@@ -586,7 +590,7 @@
             });
         }
 
-       function updateBubbleChart() {
+        function updateBubbleChart() {
             const ctx = document.getElementById('bubbleChart').getContext('2d');
             if (charts.bubble) {
                 charts.bubble.destroy();
@@ -689,7 +693,8 @@
             container.appendChild(datasetSelect);
             container.appendChild(loadButton);
         }
-function exportToCSV() {
+
+        function exportToCSV() {
             if (data.length === 0) {
                 showError('No data to export. Please add some data first.');
                 return;
@@ -996,7 +1001,8 @@ function exportToCSV() {
                     }
                 }
             });
-             const analysisResults = document.getElementById('advancedAnalysisResults');
+
+            const analysisResults = document.getElementById('advancedAnalysisResults');
             analysisResults.innerHTML += `
                 <h3>Polynomial Regression Analysis:</h3>
                 <p><strong>Equation:</strong> y = ${equation[2].toFixed(4)}x² + ${equation[1].toFixed(4)}x + ${equation[0].toFixed(4)}</p>
@@ -1081,7 +1087,165 @@ function exportToCSV() {
                 return;
             }
 
-</script
+            const values = data.map(item => item.value);
+            const mean = values.reduce((a, b) => a + b, 0) / values.length;
+            const stdDev = Math.sqrt(values.reduce((sq, n) => sq + Math.pow(n - mean, 2), 0) / values.length);
+
+            const zScores = values.map(value => (value - mean) / stdDev);
+
+            const ctx = document.getElementById('scatterPlot').getContext('2d');
+            if (charts.zScores) {
+                charts.zScores.destroy();
+            }
+            charts.zScores = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Z-Scores',
+                            data: zScores.map((z, index) => ({ x: index, y: z })),
+                            backgroundColor: generateRandomColor(),
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom'
+                        },
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+
+            const analysisResults = document.getElementById('advancedAnalysisResults');
+            analysisResults.innerHTML += `
+                <h3>Z-Score Analysis:</h3>
+                <p><strong>Mean:</strong> ${mean.toFixed(4)}</p>
+                <p><strong>Standard Deviation:</strong> ${stdDev.toFixed(4)}</p>
+                <p><strong>Z-Scores:</strong> ${zScores.map(z => z.toFixed(2)).join(', ')}</p>
+            `;
+        }
+
+        function performTimeSeriesForecasting() {
+            const periods = parseInt(document.getElementById('forecast-periods').value);
+            if (isNaN(periods) || periods < 1) {
+                showError('Please enter a valid number of periods to forecast');
+                return;
+            }
+
+            if (data.length < 3) {
+                showError('Not enough data points to perform time series forecasting');
+                return;
+            }
+
+            const values = data.map(item => item.value);
+            const forecast = simpleExponentialSmoothing(values, 0.3, periods);
+
+            const ctx = document.getElementById('forecastingChart').getContext('2d');
+            if (charts.forecasting) {
+                charts.forecasting.destroy();
+            }
+            charts.forecasting = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [...data.map(item => item.label), ...Array(periods).fill().map((_, i) => `Forecast ${i + 1}`)],
+                    datasets: [
+                        {
+                            label: 'Original Data',
+                            data: values,
+                            borderColor: generateRandomColor(),
+                            fill: false,
+                        },
+                        {
+                            label: 'Forecast',
+                            data: [...Array(values.length).fill(null), ...forecast],
+                            borderColor: generateRandomColor(),
+                            fill: false,
+                            borderDash: [5, 5],
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            const forecastingResults = document.getElementById('forecastingResults');
+            forecastingResults.innerHTML = `
+                <h3>Time Series Forecasting Results:</h3>
+                <p><strong>Forecast for next ${periods} periods:</strong> ${forecast.map(f => f.toFixed(2)).join(', ')}</p>
+            `;
+        }
+
+        function simpleExponentialSmoothing(data, alpha, periods) {
+            let forecast = [data[0]];
+            for (let i = 1; i < data.length + periods; i++) {
+                if (i < data.length) {
+                    forecast[i] = alpha * data[i] + (1 - alpha) * forecast[i - 1];
+                } else {
+                    forecast[i] = forecast[i - 1];
+                }
+            }
+            return forecast.slice(-periods);
+        }
+
+        function downloadChart(chartId, filename) {
+            const canvas = document.getElementById(chartId);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function generateReport() {
+            let report = `# Data Analysis Report\n\n`;
+            report += `## Basic Statistics\n\n`;
+            report += document.getElementById('analysisResults').innerText + '\n\n';
+            report += `## Advanced Analysis\n\n`;
+            report += document.getElementById('advancedAnalysisResults').innerText + '\n\n';
+            report += `## Forecasting Results\n\n`;
+            report += document.getElementById('forecastingResults').innerText + '\n\n';
+
+            const blob = new Blob([report], { type: 'text/markdown' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'data_analysis_report.md';
+            link.click();
+        }
+
+        function showError(message) {
+            const errorModal = document.getElementById('errorModal');
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorModal.style.display = 'block';
+
+            const closeBtn = document.getElementsByClassName('close')[0];
+            closeBtn.onclick = function () {
+                errorModal.style.display = 'none';
+            }
+
+            window.onclick = function (event) {
+                if (event.target == errorModal) {
+                    errorModal.style.display = 'none';
+                }
+            }
+        }
+
+        document.getElementById('csvFileInput').addEventListener('change', importFromCSV);
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.getElementById('DataInput').style.display = 'block';
+        });
+    </script>
 </body>
 
 </html>
