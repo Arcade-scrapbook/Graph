@@ -782,8 +782,114 @@ function exportToCSV() {
                 charts.movingAverage.destroy();
             }
             charts.movingAverage = new Chart(ctx, {
-                type: 'line'
+                type: 'line',
+                data: {
+                    labels: movingAverages.map(item => item.label),
+                    datasets: [
+                        {
+                            label: 'Original Data',
+                            data: data.map(item => item.value),
+                            borderColor: generateRandomColor(),
+                            fill: false,
+                        },
+                        {
+                            label: `Moving Average (Window: ${windowSize})`,
+                            data: movingAverages.map(item => item.value),
+                            borderColor: generateRandomColor(),
+                            fill: false,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function calculateExponentialMovingAverage(alpha) {
+            if (data.length === 0) {
+                showError('No data available for exponential moving average calculation');
+                return;
             }
+
+            const ema = [data[0].value];
+            for (let i = 1; i < data.length; i++) {
+                ema.push(alpha * data[i].value + (1 - alpha) * ema[i - 1]);
+            }
+
+            const ctx = document.getElementById('lineChart').getContext('2d');
+            if (charts.ema) {
+                charts.ema.destroy();
+            }
+            charts.ema = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(item => item.label),
+                    datasets: [
+                        {
+                            label: 'Original Data',
+                            data: data.map(item => item.value),
+                            borderColor: generateRandomColor(),
+                            fill: false,
+                        },
+                        {
+                            label: `Exponential Moving Average (α: ${alpha})`,
+                            data: ema,
+                            borderColor: generateRandomColor(),
+                            fill: false,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function calculateCorrelation() {
+            if (data.length < 2) {
+                showError('Not enough data points to calculate correlation');
+                return;
+            }
+
+            const n = data.length;
+            const x = data.map((_, i) => i);
+            const y = data.map(item => item.value);
+
+            const sumX = x.reduce((a, b) => a + b, 0);
+            const sumY = y.reduce((a, b) => a + b, 0);
+            const sumXY = x.reduce((acc, val, i) => acc + val * y[i], 0);
+            const sumX2 = x.reduce((acc, val) => acc + val * val, 0);
+            const sumY2 = y.reduce((acc, val) => acc + val * val, 0);
+
+            const numerator = n * sumXY - sumX * sumY;
+            const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+
+            const correlation = numerator / denominator;
+
+            const analysisResults = document.getElementById('advancedAnalysisResults');
+            analysisResults.innerHTML += `
+                <h3>Correlation Analysis:</h3>
+                <p><strong>Correlation coefficient:</strong> ${correlation.toFixed(4)}</p>
+            `;
+        }
+
+        function calculateLinearRegression() {
+            if (data.length < 2) {
+                showError('Not enough data points to calculate linear regression');
+                return;
+            }
+        }
 </script
 </body>
 
