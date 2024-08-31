@@ -374,6 +374,119 @@
                 showError('Please enter valid label and value.');
             }
         }
+       function clearData() {
+            data = [];
+            updateDataTable();
+            updateCharts();
+            updateDataAnalysis();
+        }
+
+        function removeDataPoint(index) {
+            data.splice(index, 1);
+            updateDataTable();
+            updateCharts();
+            updateDataAnalysis();
+        }
+
+        function updateDataTable() {
+            const tableBody = document.getElementById('data-body');
+            tableBody.innerHTML = '';
+            data.forEach((item, index) => {
+                const row = tableBody.insertRow();
+                row.insertCell(0).textContent = item.label;
+                row.insertCell(1).textContent = item.value;
+                const actionCell = row.insertCell(2);
+                const removeButton = document.createElement('button');
+                removeButton.textContent = 'Remove';
+                removeButton.onclick = () => removeDataPoint(index);
+                actionCell.appendChild(removeButton);
+            });
+        }
+
+        function updateCharts() {
+            updateBarChart();
+            updateLineChart();
+            updatePieChart();
+            updateDoughnutChart();
+            updateScatterPlot();
+            updateRadarChart();
+            updatePolarAreaChart();
+            updateBubbleChart();
+        }
+
+        function updateBarChart() {
+            const ctx = document.getElementById('barChart').getContext('2d');
+            if (charts.bar) {
+                charts.bar.destroy();
+            }
+            charts.bar = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(item => item.label),
+                    datasets: [{
+                        label: 'Bar Chart',
+                        data: data.map(item => item.value),
+                        backgroundColor: data.map(() => generateRandomColor()),
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateLineChart() {
+            const ctx = document.getElementById('lineChart').getContext('2d');
+            if (charts.line) {
+                charts.line.destroy();
+            }
+            charts.line = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(item => item.label),
+                    datasets: [{
+                        label: 'Line Chart',
+                        data: data.map(item => item.value),
+                        borderColor: generateRandomColor(),
+                        fill: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function updatePieChart() {
+            const ctx = document.getElementById('pieChart').getContext('2d');
+            if (charts.pie) {
+                charts.pie.destroy();
+            }
+            charts.pie = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: data.map(item => item.label),
+                    datasets: [{
+                        label: 'Pie Chart',
+                        data: data.map(item => item.value),
+                        backgroundColor: data.map(() => generateRandomColor()),
+                    }]
+                },
+                options: {
+                    responsive: true,
+                }
+            });
+        }
 </script
 </body>
 
