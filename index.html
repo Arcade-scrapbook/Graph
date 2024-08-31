@@ -689,6 +689,101 @@
             container.appendChild(datasetSelect);
             container.appendChild(loadButton);
         }
+function exportToCSV() {
+            if (data.length === 0) {
+                showError('No data to export. Please add some data first.');
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Label,Value\n";
+            data.forEach(item => {
+                csvContent += `${item.label},${item.value}\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "chart_data.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function importFromCSV(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const contents = e.target.result;
+                const lines = contents.split('\n');
+                data = [];
+                for (let i = 1; i < lines.length; i++) {
+                    const [label, value] = lines[i].split(',');
+                    if (label && value) {
+                        data.push({ label: label.trim(), value: parseFloat(value.trim()) });
+                    }
+                }
+                updateDataTable();
+                updateCharts();
+                updateDataAnalysis();
+            };
+            reader.readAsText(file);
+        }
+
+        function updateDataAnalysis() {
+            const analysisResults = document.getElementById('analysisResults');
+            if (data.length === 0) {
+                analysisResults.innerHTML = '<p>No data available for analysis.</p>';
+                return;
+            }
+
+            const values = data.map(item => item.value);
+            const sum = values.reduce((a, b) => a + b, 0);
+            const average = sum / values.length;
+            const min = Math.min(...values);
+            const max = Math.max(...values);
+
+            const sortedValues = values.slice().sort((a, b) => a - b);
+            const median = values.length % 2 === 0
+                ? (sortedValues[values.length / 2 - 1] + sortedValues[values.length / 2]) / 2
+                : sortedValues[Math.floor(values.length / 2)];
+
+            const variance = values.reduce((acc, val) => acc + Math.pow(val - average, 2), 0) / values.length;
+            const stdDev = Math.sqrt(variance);
+
+            analysisResults.innerHTML = `
+                <h3>Basic Statistics:</h3>
+                <p><strong>Number of data points:</strong> ${values.length}</p>
+                <p><strong>Sum:</strong> ${sum.toFixed(2)}</p>
+                <p><strong>Average:</strong> ${average.toFixed(2)}</p>
+                <p><strong>Median:</strong> ${median.toFixed(2)}</p>
+                <p><strong>Minimum:</strong> ${min.toFixed(2)}</p>
+                <p><strong>Maximum:</strong> ${max.toFixed(2)}</p>
+                <p><strong>Range:</strong> ${(max - min).toFixed(2)}</p>
+                <p><strong>Variance:</strong> ${variance.toFixed(2)}</p>
+                <p><strong>Standard Deviation:</strong> ${stdDev.toFixed(2)}</p>
+            `;
+        }
+
+        function calculateMovingAverage(windowSize) {
+            if (data.length < windowSize) {
+                showError(`Not enough data points for a moving average of window size ${windowSize}`);
+                return;
+            }
+
+            const movingAverages = [];
+            for (let i = windowSize - 1; i < data.length; i++) {
+                const window = data.slice(i - windowSize + 1, i + 1);
+                const average = window.reduce((sum, item) => sum + item.value, 0) / windowSize;
+                movingAverages.push({ label: data[i].label, value: average });
+            }
+
+            const ctx = document.getElementById('lineChart').getContext('2d');
+            if (charts.movingAverage) {
+                charts.movingAverage.destroy();
+            }
+            charts.movingAverage = new Chart(ctx, {
+                type: 'line'
+            }
 </script
 </body>
 
